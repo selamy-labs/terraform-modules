@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tflint:
+    name: tflint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+      - name: Init tflint plugins
+        run: tflint --init
+      - name: Lint modules
+        run: |
+          for dir in modules/*/; do
+            echo "::group::tflint $dir"
+            tflint --chdir="$dir" --config="$(pwd)/.tflint.hcl"
+            echo "::endgroup::"
+          done
+
+  trivy:
+    name: trivy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy misconfig scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: 1
+
+  tofu-test:
+    name: tofu test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.8.0
+      - name: Run tests for each module
+        run: |
+          overall=0
+          for dir in modules/*/; do
+            echo "::group::tofu test $dir"
+            cd "$dir"
+            tofu init -backend=false
+            tofu test || overall=1
+            cd "$GITHUB_WORKSPACE"
+            echo "::endgroup::"
+          done
+          exit $overall
+
+  terraform-docs:
+    name: terraform-docs drift check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: terraform-docs/gh-actions@v1.3.0
+        with:
+          find-dir: modules
+          output-file: README.md
+          output-method: inject
+          fail-on-diff: true
+
+  validate:
+    name: tofu validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.8.0
+      - name: Validate each module
+        run: |
+          for dir in modules/*/; do
+            echo "::group::tofu validate $dir"
+            cd "$dir"
+            tofu init -backend=false
+            tofu validate
+            cd "$GITHUB_WORKSPACE"
+            echo "::endgroup::"
+          done
