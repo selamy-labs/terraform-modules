@@ -65,7 +65,7 @@ No modules.
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Kubernetes namespace for the runner scale set. | `string` | `"github-runners"` | no |
 | <a name="input_runner_group"></a> [runner\_group](#input\_runner\_group) | GitHub runner group the scale set joins. | `string` | `"Default"` | no |
 | <a name="input_runner_image"></a> [runner\_image](#input\_runner\_image) | Runner container image. | `string` | `"ghcr.io/actions/actions-runner:latest"` | no |
-| <a name="input_runner_resources"></a> [runner\_resources](#input\_runner\_resources) | Runner container resource requests/limits. | <pre>object({<br>    requests = optional(map(string), { cpu = "250m", memory = "512Mi" })<br>    limits   = optional(map(string), { cpu = "1", memory = "2Gi" })<br>  })</pre> | `{}` | no |
+| <a name="input_runner_resources"></a> [runner\_resources](#input\_runner\_resources) | Runner container resource requests/limits. | <pre>object({<br/>    requests = optional(map(string), { cpu = "250m", memory = "512Mi" })<br/>    limits   = optional(map(string), { cpu = "1", memory = "2Gi" })<br/>  })</pre> | `{}` | no |
 
 ## Outputs
 
