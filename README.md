@@ -18,7 +18,7 @@ reference an unpinned `main` and never copy a module into a consumer repo.
 
 ```hcl
 module "my_secret" {
-  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/gsm-secret?ref=v0.1.0"
+  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/gsm-secret?ref=v0.2.0"
 
   project_id = "my-project"
   secret_id  = "my-secret"

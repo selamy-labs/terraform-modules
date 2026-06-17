@@ -6,7 +6,7 @@ Creates a Google Secret Manager secret with optional version and IAM accessor bi
 
 ```hcl
 module "my_secret" {
-  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/gsm-secret?ref=v0.1.0"
+  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/gsm-secret?ref=v0.2.0"
 
   project_id = "my-project"
   secret_id  = "my-secret"
@@ -22,13 +22,13 @@ module "my_secret" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 5.0, < 7.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 5.0, < 7.0 |
 
 ## Modules
 
