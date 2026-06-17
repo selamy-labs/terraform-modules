@@ -6,7 +6,7 @@ Creates a Google Cloud Monitoring alert policy scoped by label. Cloud policy onl
 
 ```hcl
 module "my_alert" {
-  source = "github.com/selamy-labs/terraform-modules//modules/monitoring-policy"
+  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/monitoring-policy?ref=v0.1.0"
 
   project_id   = "my-project"
   display_name = "High CPU - my-app"

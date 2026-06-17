@@ -6,7 +6,7 @@ Creates a GCP service account with Workload Identity Federation bindings and opt
 
 ```hcl
 module "my_sa" {
-  source = "github.com/selamy-labs/terraform-modules//modules/gcp-sa-wif"
+  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/gcp-sa-wif?ref=v0.1.0"
 
   project_id              = "my-project"
   account_id              = "my-app-sa"
