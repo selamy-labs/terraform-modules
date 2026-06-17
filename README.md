@@ -10,6 +10,10 @@ Reusable OpenTofu modules for cloud/provider resources. Layer split: TF = cloud,
 | [gcp-sa-wif](modules/gcp-sa-wif/) | GCP service account + Workload Identity Federation |
 | [github-repo](modules/github-repo/) | GitHub repository + branch protection + defaults |
 | [monitoring-policy](modules/monitoring-policy/) | Google Cloud Monitoring alert policy scoped by label |
+| [arc-runner-scale-set](modules/arc-runner-scale-set/) | GitHub Actions Runner Controller (ARC) runner scale set via the upstream `gha-runner-scale-set` chart |
+
+> **New repos: ingest canonical IaC by default.** Never home-roll a module
+> that duplicates one of these — see [NEW_REPO_BOOTSTRAP.md](NEW_REPO_BOOTSTRAP.md).
 
 ## Usage
 
