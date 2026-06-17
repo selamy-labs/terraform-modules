@@ -6,7 +6,7 @@ Creates a GitHub repository with default settings and optional branch protection
 
 ```hcl
 module "my_repo" {
-  source = "github.com/selamy-labs/terraform-modules//modules/github-repo"
+  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/github-repo?ref=v0.1.0"
 
   name        = "my-repo"
   description = "Managed by OpenTofu"

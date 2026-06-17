@@ -13,12 +13,36 @@ Reusable OpenTofu modules for cloud/provider resources. Layer split: TF = cloud,
 
 ## Usage
 
+Consume modules by **git source pinned to a semver tag** (`?ref=vX.Y.Z`). Never
+reference an unpinned `main` and never copy a module into a consumer repo.
+
 ```hcl
 module "my_secret" {
-  source = "github.com/selamy-labs/terraform-modules//modules/gsm-secret"
-  # ...
+  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/gsm-secret?ref=v0.1.0"
+
+  project_id = "my-project"
+  secret_id  = "my-secret"
 }
 ```
+
+## Versioning & adoption
+
+Modules are released as immutable semver git tags. Consumers pin to a tag so an
+upstream change can never silently alter a consumer's plan.
+
+**Adoption recipe** (replace an inlined resource block with a pinned module):
+
+1. Find the equivalent module in [`modules/`](modules/).
+2. Replace the inline `resource` block(s) with a `module` block whose `source`
+   is `git::https://github.com/selamy-labs/terraform-modules.git//modules/<name>?ref=v<tag>`.
+3. Map the resource arguments onto the module's variables (see the module README).
+4. Run `tofu init && tofu plan` and confirm the plan is a no-op (or only the
+   intended changes) before applying — `moved` blocks can preserve state.
+5. To pick up a new module release, bump the `?ref=` tag and re-plan.
+
+To cut a new release: merge to `main`, then push a new `vX.Y.Z` tag
+(MAJOR = breaking variable/output change, MINOR = new module/variable,
+PATCH = fix). Pre-`v1.0.0` minors may include breaking changes.
 
 ## CI
 
