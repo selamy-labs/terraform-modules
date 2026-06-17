@@ -12,3 +12,33 @@ tofu plan
 Requires:
 - An ARC controller already installed (`gha-runner-scale-set-controller`).
 - The `github-runner-auth` Secret present in the target namespace.
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+No requirements.
+
+## Providers
+
+No providers.
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_agents_runners"></a> [agents\_runners](#module\_agents\_runners) | ../../ | n/a |
+
+## Resources
+
+No resources.
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_release_name"></a> [release\_name](#output\_release\_name) | n/a |
+<!-- END_TF_DOCS -->
