@@ -55,7 +55,7 @@ fallback pool is proven usable before any workload is moved.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | >= 6.0, < 8.0 |
 
 ## Modules
 
