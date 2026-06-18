@@ -33,6 +33,16 @@ output "preemptible_node_pool_id" {
   value       = oci_containerengine_node_pool.preemptible.id
 }
 
+output "preemptible_min_size" {
+  description = "Minimum size declared for cluster-autoscaler management of the preemptible node pool."
+  value       = var.preemptible_min_size
+}
+
+output "preemptible_max_size" {
+  description = "Maximum size declared for cluster-autoscaler management of the preemptible node pool."
+  value       = var.preemptible_max_size
+}
+
 output "fallback_node_pool_id" {
   description = "Fallback on-demand node pool OCID, when enabled."
   value       = try(oci_containerengine_node_pool.fallback[0].id, null)

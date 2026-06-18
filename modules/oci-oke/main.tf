@@ -201,7 +201,12 @@ resource "oci_containerengine_node_pool" "preemptible" {
   kubernetes_version = var.kubernetes_version
   name               = "${var.name}-preemptible"
   node_shape         = var.preemptible_node_shape
-  freeform_tags      = local.tags
+  freeform_tags = merge(
+    local.tags,
+    var.enable_preemptible_autoscaler ? {
+      cluster_autoscaler = "managed"
+    } : {}
+  )
 
   node_shape_config {
     ocpus         = var.preemptible_ocpus
@@ -238,6 +243,17 @@ resource "oci_containerengine_node_pool" "preemptible" {
   initial_node_labels {
     key   = "speedforge.dev/substrate"
     value = "oci-oke-preemptible"
+  }
+
+  initial_node_labels {
+    key   = "oke.oraclecloud.com/cluster_autoscaler"
+    value = var.enable_preemptible_autoscaler ? "managed" : "disabled"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      node_config_details[0].size,
+    ]
   }
 }
 
@@ -279,5 +295,10 @@ resource "oci_containerengine_node_pool" "fallback" {
   initial_node_labels {
     key   = "speedforge.dev/substrate"
     value = "oci-oke-fallback"
+  }
+
+  initial_node_labels {
+    key   = "oke.oraclecloud.com/cluster_autoscaler"
+    value = "allowed"
   }
 }

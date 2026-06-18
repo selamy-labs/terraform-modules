@@ -112,6 +112,24 @@ variable "preemptible_node_count" {
   default     = 1
 }
 
+variable "preemptible_min_size" {
+  description = "Minimum size for the preemptible node pool when cluster-autoscaler manages it."
+  type        = number
+  default     = 1
+}
+
+variable "preemptible_max_size" {
+  description = "Maximum size for the preemptible node pool when cluster-autoscaler manages it."
+  type        = number
+  default     = 8
+}
+
+variable "enable_preemptible_autoscaler" {
+  description = "Allow the Kubernetes cluster-autoscaler to manage the preemptible node pool size."
+  type        = bool
+  default     = true
+}
+
 variable "fallback_node_shape" {
   description = "OCI compute shape for on-demand fallback runner nodes."
   type        = string

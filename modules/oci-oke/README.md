@@ -6,6 +6,9 @@ Creates a small Oracle Kubernetes Engine substrate for runner experiments:
 - a BASIC OKE cluster
 - one preemptible node pool for normal CI runner capacity
 - one optional on-demand fallback pool for scheduler/autoscaler escape capacity
+- cluster-autoscaler labels and pool-size drift handling for the preemptible
+  pool; install the autoscaler from the consuming cluster root after kubeconfig
+  is available
 
 The module intentionally does not configure the OCI provider. Callers should
 prefer workload identity where available, or inject the OCI API key through the
@@ -91,6 +94,7 @@ No modules.
 | <a name="input_api_subnet_cidr"></a> [api\_subnet\_cidr](#input\_api\_subnet\_cidr) | Public subnet for the Kubernetes API endpoint. | `string` | `"10.80.0.0/24"` | no |
 | <a name="input_boot_volume_size_gb"></a> [boot\_volume\_size\_gb](#input\_boot\_volume\_size\_gb) | Boot volume size for worker nodes. | `number` | `100` | no |
 | <a name="input_enable_fallback_pool"></a> [enable\_fallback\_pool](#input\_enable\_fallback\_pool) | Create the on-demand fallback node pool. | `bool` | `true` | no |
+| <a name="input_enable_preemptible_autoscaler"></a> [enable\_preemptible\_autoscaler](#input\_enable\_preemptible\_autoscaler) | Allow the Kubernetes cluster-autoscaler to manage the preemptible node pool size. | `bool` | `true` | no |
 | <a name="input_endpoint_allowed_cidrs"></a> [endpoint\_allowed\_cidrs](#input\_endpoint\_allowed\_cidrs) | CIDRs allowed to reach the public Kubernetes API endpoint. | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
 | <a name="input_fallback_memory_gb"></a> [fallback\_memory\_gb](#input\_fallback\_memory\_gb) | Memory for each fallback flex node. | `number` | `16` | no |
 | <a name="input_fallback_node_count"></a> [fallback\_node\_count](#input\_fallback\_node\_count) | Initial on-demand fallback node count. Use min>=1 so fallback capacity is tested. | `number` | `1` | no |
@@ -102,6 +106,8 @@ No modules.
 | <a name="input_pod_subnet_cidr"></a> [pod\_subnet\_cidr](#input\_pod\_subnet\_cidr) | Private subnet used by OCI VCN-native pod networking. | `string` | `"10.80.20.0/22"` | no |
 | <a name="input_pods_cidr"></a> [pods\_cidr](#input\_pods\_cidr) | Kubernetes pods CIDR used by the OKE cluster record. | `string` | `"10.244.0.0/16"` | no |
 | <a name="input_preemptible_memory_gb"></a> [preemptible\_memory\_gb](#input\_preemptible\_memory\_gb) | Memory for each preemptible flex node. | `number` | `16` | no |
+| <a name="input_preemptible_max_size"></a> [preemptible\_max\_size](#input\_preemptible\_max\_size) | Maximum size for the preemptible node pool when cluster-autoscaler manages it. | `number` | `8` | no |
+| <a name="input_preemptible_min_size"></a> [preemptible\_min\_size](#input\_preemptible\_min\_size) | Minimum size for the preemptible node pool when cluster-autoscaler manages it. | `number` | `1` | no |
 | <a name="input_preemptible_node_count"></a> [preemptible\_node\_count](#input\_preemptible\_node\_count) | Initial preemptible node count. Use min>=1 for the side-by-side runner experiment. | `number` | `1` | no |
 | <a name="input_preemptible_node_shape"></a> [preemptible\_node\_shape](#input\_preemptible\_node\_shape) | OCI compute shape for preemptible runner nodes. | `string` | `"VM.Standard.E4.Flex"` | no |
 | <a name="input_preemptible_ocpus"></a> [preemptible\_ocpus](#input\_preemptible\_ocpus) | OCPUs for each preemptible flex node. | `number` | `2` | no |
@@ -119,6 +125,8 @@ No modules.
 | <a name="output_fallback_node_pool_id"></a> [fallback\_node\_pool\_id](#output\_fallback\_node\_pool\_id) | Fallback on-demand node pool OCID, when enabled. |
 | <a name="output_node_subnet_id"></a> [node\_subnet\_id](#output\_node\_subnet\_id) | Worker node subnet OCID. |
 | <a name="output_pod_subnet_id"></a> [pod\_subnet\_id](#output\_pod\_subnet\_id) | Pod subnet OCID. |
+| <a name="output_preemptible_max_size"></a> [preemptible\_max\_size](#output\_preemptible\_max\_size) | Maximum size declared for cluster-autoscaler management of the preemptible node pool. |
+| <a name="output_preemptible_min_size"></a> [preemptible\_min\_size](#output\_preemptible\_min\_size) | Minimum size declared for cluster-autoscaler management of the preemptible node pool. |
 | <a name="output_preemptible_node_pool_id"></a> [preemptible\_node\_pool\_id](#output\_preemptible\_node\_pool\_id) | Preemptible node pool OCID. |
 | <a name="output_vcn_id"></a> [vcn\_id](#output\_vcn\_id) | VCN OCID. |
 <!-- END_TF_DOCS -->
