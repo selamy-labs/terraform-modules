@@ -55,7 +55,7 @@ fallback pool is proven usable before any workload is moved.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | >= 6.0, < 8.0 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 7.32.0 |
 
 ## Modules
 
@@ -105,8 +105,8 @@ No modules.
 | <a name="input_node_subnet_cidr"></a> [node\_subnet\_cidr](#input\_node\_subnet\_cidr) | Private subnet for OKE worker nodes. | `string` | `"10.80.10.0/24"` | no |
 | <a name="input_pod_subnet_cidr"></a> [pod\_subnet\_cidr](#input\_pod\_subnet\_cidr) | Private subnet used by OCI VCN-native pod networking. | `string` | `"10.80.20.0/22"` | no |
 | <a name="input_pods_cidr"></a> [pods\_cidr](#input\_pods\_cidr) | Kubernetes pods CIDR used by the OKE cluster record. | `string` | `"10.244.0.0/16"` | no |
-| <a name="input_preemptible_memory_gb"></a> [preemptible\_memory\_gb](#input\_preemptible\_memory\_gb) | Memory for each preemptible flex node. | `number` | `16` | no |
 | <a name="input_preemptible_max_size"></a> [preemptible\_max\_size](#input\_preemptible\_max\_size) | Maximum size for the preemptible node pool when cluster-autoscaler manages it. | `number` | `8` | no |
+| <a name="input_preemptible_memory_gb"></a> [preemptible\_memory\_gb](#input\_preemptible\_memory\_gb) | Memory for each preemptible flex node. | `number` | `16` | no |
 | <a name="input_preemptible_min_size"></a> [preemptible\_min\_size](#input\_preemptible\_min\_size) | Minimum size for the preemptible node pool when cluster-autoscaler manages it. | `number` | `1` | no |
 | <a name="input_preemptible_node_count"></a> [preemptible\_node\_count](#input\_preemptible\_node\_count) | Initial preemptible node count. Use min>=1 for the side-by-side runner experiment. | `number` | `1` | no |
 | <a name="input_preemptible_node_shape"></a> [preemptible\_node\_shape](#input\_preemptible\_node\_shape) | OCI compute shape for preemptible runner nodes. | `string` | `"VM.Standard.E4.Flex"` | no |
