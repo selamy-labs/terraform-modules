@@ -22,13 +22,9 @@ module "secret" {
   # ...
 }
 
-module "runners" {
-  source = "git::https://github.com/selamy-labs/terraform-modules.git//modules/arc-runner-scale-set?ref=v0.3.0"
-  # ...
-}
 ```
 
-Available modules: `gsm-secret`, `gcp-sa-wif`, `github-repo`, `monitoring-policy`, `arc-runner-scale-set`. If a shape you need is missing, ADD it to `terraform-modules` (strict module file-structure + tests + `tofu validate`/`tofu test` + a new tag) — do not inline it.
+Available modules: `gsm-secret`, `gcp-sa-wif`, `github-repo`, `monitoring-policy`. (The ARC runner-scale-set module now lives in the public [speedforge/terraform-modules](https://github.com/speedforge/terraform-modules) repo: `git::https://github.com/speedforge/terraform-modules.git//modules/arc-runner-scale-set?ref=v0.1.0`.) If a shape you need is missing, ADD it to `terraform-modules` (strict module file-structure + tests + `tofu validate`/`tofu test` + a new tag) — do not inline it.
 
 ## Helm (agent workloads)
 
