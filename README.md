@@ -2,6 +2,20 @@
 
 Reusable OpenTofu modules for cloud/provider resources. Layer split: TF = cloud, Helm = k8s.
 
+```mermaid
+flowchart TD
+    Source[terraform-modules repo] --> Tag[Semver release tag]
+    Tag --> Consumer[Consumer OpenTofu repo]
+    Consumer --> Module[Select module]
+    Module --> Init[tofu init]
+    Init --> Plan[tofu plan]
+    Plan --> Apply[Reviewed apply]
+
+    Module --> Agent[agent]
+    Module --> Secret[gsm-secret]
+    Module --> Repo[github-repo]
+```
+
 ## Modules
 
 | Module | Description |
