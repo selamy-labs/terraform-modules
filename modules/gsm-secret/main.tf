@@ -17,10 +17,22 @@ resource "google_secret_manager_secret_version" "this" {
 }
 
 resource "google_secret_manager_secret_iam_member" "accessors" {
-  for_each = toset(var.accessor_members)
+  for_each = merge(
+    { for member in var.accessor_members : member => member },
+    var.named_accessor_members,
+  )
 
   project   = var.project_id
   secret_id = google_secret_manager_secret.this.secret_id
   role      = "roles/secretmanager.secretAccessor"
+  member    = each.value
+}
+
+resource "google_secret_manager_secret_iam_member" "version_adders" {
+  for_each = var.version_adder_members
+
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.this.secret_id
+  role      = "roles/secretmanager.secretVersionAdder"
   member    = each.value
 }

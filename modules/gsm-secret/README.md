@@ -13,6 +13,14 @@ module "my_secret" {
 
   secret_data      = "s3cret"
   accessor_members = ["serviceAccount:app@my-project.iam.gserviceaccount.com"]
+
+  # Use stable keys when migrating existing singleton IAM resources.
+  named_accessor_members = {
+    external_secrets = "serviceAccount:eso@my-project.iam.gserviceaccount.com"
+  }
+  version_adder_members = {
+    operator = "user:operator@example.com"
+  }
 }
 ```
 
@@ -40,6 +48,7 @@ No modules.
 |------|------|
 | [google_secret_manager_secret.this](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
 | [google_secret_manager_secret_iam_member.accessors](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_member) | resource |
+| [google_secret_manager_secret_iam_member.version_adders](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_member) | resource |
 | [google_secret_manager_secret_version.this](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_version) | resource |
 
 ## Inputs
@@ -50,7 +59,9 @@ No modules.
 | <a name="input_secret_id"></a> [secret\_id](#input\_secret\_id) | The secret ID within Secret Manager. | `string` | n/a | yes |
 | <a name="input_accessor_members"></a> [accessor\_members](#input\_accessor\_members) | List of IAM members granted secretmanager.secretAccessor (e.g. serviceAccount:x@proj.iam.gserviceaccount.com). | `list(string)` | `[]` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Labels to attach to the secret. | `map(string)` | `{}` | no |
+| <a name="input_named_accessor_members"></a> [named\_accessor\_members](#input\_named\_accessor\_members) | Map of stable IAM member keys to members granted secretmanager.secretAccessor. Use when migrating existing singleton IAM resources without changing Terraform addresses. | `map(string)` | `{}` | no |
 | <a name="input_secret_data"></a> [secret\_data](#input\_secret\_data) | Optional secret payload. When null, only the secret resource is created (no version). | `string` | `null` | no |
+| <a name="input_version_adder_members"></a> [version\_adder\_members](#input\_version\_adder\_members) | Map of stable IAM member keys to members granted secretmanager.secretVersionAdder. | `map(string)` | `{}` | no |
 
 ## Outputs
 

@@ -31,6 +31,18 @@ variable "accessor_members" {
   default     = []
 }
 
+variable "named_accessor_members" {
+  description = "Map of stable IAM member keys to members granted secretmanager.secretAccessor. Use when migrating existing singleton IAM resources without changing Terraform addresses."
+  type        = map(string)
+  default     = {}
+}
+
+variable "version_adder_members" {
+  description = "Map of stable IAM member keys to members granted secretmanager.secretVersionAdder."
+  type        = map(string)
+  default     = {}
+}
+
 variable "labels" {
   description = "Labels to attach to the secret."
   type        = map(string)
