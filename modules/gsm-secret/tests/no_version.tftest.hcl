@@ -22,4 +22,9 @@ run "skips_iam_when_empty" {
     condition     = length(google_secret_manager_secret_iam_member.accessors) == 0
     error_message = "Expected no IAM bindings when accessor_members is empty."
   }
+
+  assert {
+    condition     = length(google_secret_manager_secret_iam_member.version_adders) == 0
+    error_message = "Expected no version adder IAM bindings when version_adder_members is empty."
+  }
 }
