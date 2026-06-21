@@ -37,12 +37,13 @@ variable "scope_labels" {
 }
 
 variable "conditions" {
-  description = "List of alert conditions."
+  description = "List of alert conditions. Defaults to threshold conditions; set condition_type=\"absent\" for condition_absent."
   type = list(object({
     display_name         = string
     filter               = string
-    comparison           = string
-    threshold_value      = number
+    condition_type       = optional(string, "threshold")
+    comparison           = optional(string)
+    threshold_value      = optional(number)
     duration             = string
     alignment_period     = optional(string, "60s")
     per_series_aligner   = optional(string, "ALIGN_RATE")
@@ -50,6 +51,29 @@ variable "conditions" {
     group_by_fields      = optional(list(string), [])
     trigger_count        = optional(number, 1)
   }))
+
+  validation {
+    condition = alltrue([
+      for c in var.conditions : contains(["threshold", "absent"], try(c.condition_type, "threshold"))
+    ])
+    error_message = "conditions[*].condition_type must be threshold or absent."
+  }
+
+  validation {
+    condition = alltrue([
+      for c in var.conditions : try(c.condition_type, "threshold") != "threshold" || (c.comparison != null && c.threshold_value != null)
+    ])
+    error_message = "threshold conditions require comparison and threshold_value."
+  }
+}
+
+variable "documentation" {
+  description = "Optional alert documentation block."
+  type = object({
+    content   = string
+    mime_type = optional(string, "text/markdown")
+  })
+  default = null
 }
 
 variable "notification_channels" {
