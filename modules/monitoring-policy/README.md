@@ -39,7 +39,7 @@ documentation = {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | >= 5.0, < 7.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 6.50.0 |
 
 ## Modules
 
@@ -55,7 +55,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_conditions"></a> [conditions](#input\_conditions) | List of alert conditions. Defaults to threshold conditions; set condition_type="absent" for condition_absent. | <pre>list(object({<br/>    display_name         = string<br/>    filter               = string<br/>    condition_type       = optional(string, "threshold")<br/>    comparison           = optional(string)<br/>    threshold_value      = optional(number)<br/>    duration             = string<br/>    alignment_period     = optional(string, "60s")<br/>    per_series_aligner   = optional(string, "ALIGN_RATE")<br/>    cross_series_reducer = optional(string, "REDUCE_NONE")<br/>    group_by_fields      = optional(list(string), [])<br/>    trigger_count        = optional(number, 1)<br/>  }))</pre> | n/a | yes |
+| <a name="input_conditions"></a> [conditions](#input\_conditions) | List of alert conditions. Defaults to threshold conditions; set condition\_type="absent" for condition\_absent. | <pre>list(object({<br/>    display_name         = string<br/>    filter               = string<br/>    condition_type       = optional(string, "threshold")<br/>    comparison           = optional(string)<br/>    threshold_value      = optional(number)<br/>    duration             = string<br/>    alignment_period     = optional(string, "60s")<br/>    per_series_aligner   = optional(string, "ALIGN_RATE")<br/>    cross_series_reducer = optional(string, "REDUCE_NONE")<br/>    group_by_fields      = optional(list(string), [])<br/>    trigger_count        = optional(number, 1)<br/>  }))</pre> | n/a | yes |
 | <a name="input_display_name"></a> [display\_name](#input\_display\_name) | Display name for the alert policy. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | GCP project ID. | `string` | n/a | yes |
 | <a name="input_auto_close_duration"></a> [auto\_close\_duration](#input\_auto\_close\_duration) | Auto-close duration (e.g. 86400s). Null to omit. | `string` | `null` | no |
