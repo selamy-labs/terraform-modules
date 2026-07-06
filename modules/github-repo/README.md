@@ -69,6 +69,7 @@ No modules.
 | <a name="input_required_status_checks"></a> [required\_status\_checks](#input\_required\_status\_checks) | List of required status check context names. | `list(string)` | `[]` | no |
 | <a name="input_squash_merge_commit_message"></a> [squash\_merge\_commit\_message](#input\_squash\_merge\_commit\_message) | Squash merge commit message: PR\_BODY, COMMIT\_MESSAGES, or BLANK. | `string` | `"PR_BODY"` | no |
 | <a name="input_squash_merge_commit_title"></a> [squash\_merge\_commit\_title](#input\_squash\_merge\_commit\_title) | Squash merge commit title: PR\_TITLE or COMMIT\_OR\_PR\_TITLE. | `string` | `"PR_TITLE"` | no |
+| <a name="input_strict_status_checks"></a> [strict\_status\_checks](#input\_strict\_status\_checks) | Require branches to be up to date before merging when status checks are required. | `bool` | `true` | no |
 | <a name="input_template_repository"></a> [template\_repository](#input\_template\_repository) | Template repository to use. Set to null to skip. | <pre>object({<br/>    owner      = string<br/>    repository = string<br/>  })</pre> | `null` | no |
 | <a name="input_topics"></a> [topics](#input\_topics) | Repository topics. | `list(string)` | `[]` | no |
 | <a name="input_visibility"></a> [visibility](#input\_visibility) | Repository visibility: public or private. | `string` | `"private"` | no |

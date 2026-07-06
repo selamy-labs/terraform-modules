@@ -39,4 +39,22 @@ run "creates_branch_protection" {
     condition     = length(github_branch_protection.default) == 1
     error_message = "Expected branch protection."
   }
+
+  assert {
+    condition     = github_branch_protection.default[0].required_status_checks[0].strict == true
+    error_message = "Expected strict status checks by default."
+  }
+}
+
+run "allows_non_strict_status_checks" {
+  command = plan
+
+  variables {
+    strict_status_checks = false
+  }
+
+  assert {
+    condition     = github_branch_protection.default[0].required_status_checks[0].strict == false
+    error_message = "Expected strict status checks override to be honored."
+  }
 }
