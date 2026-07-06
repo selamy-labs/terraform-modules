@@ -167,6 +167,12 @@ variable "required_status_checks" {
   default     = []
 }
 
+variable "strict_status_checks" {
+  description = "Require branches to be up to date before merging when status checks are required."
+  type        = bool
+  default     = true
+}
+
 variable "required_approving_review_count" {
   description = "Number of required approving reviews. Set to 0 to disable."
   type        = number
