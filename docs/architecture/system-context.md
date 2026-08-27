@@ -11,6 +11,7 @@ flowchart LR
     source["Semver-pinned Git module source"]
     identity["Identity and secrets<br/>agent, gcp-sa-wif, gsm-secret"]
     governance["Governance and observability<br/>github-repo, monitoring-policy"]
+    managed["Managed AI definitions<br/>gemini-managed-agents"]
     runners["Runner infrastructure<br/>runner-cluster, oci-oke"]
     providers["OpenTofu provider APIs"]
     resources["GCP, GitHub, OCI, runner substrates"]
@@ -19,13 +20,16 @@ flowchart LR
     consumers --> source
     source --> identity
     source --> governance
+    source --> managed
     source --> runners
     identity --> providers
     governance --> providers
+    managed --> providers
     runners --> providers
     providers --> resources
     identity --> outputs
     governance --> outputs
+    managed --> outputs
     runners --> outputs
     outputs --> consumers
 ```

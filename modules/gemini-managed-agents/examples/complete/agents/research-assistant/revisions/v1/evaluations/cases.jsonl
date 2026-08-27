@@ -1,0 +1,1 @@
+{"id":"grounded-summary","input":"Summarize the supplied publication.","expect":{"minimum_sources":1,"unsupported_claims":0}}
