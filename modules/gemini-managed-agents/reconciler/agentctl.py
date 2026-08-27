@@ -35,7 +35,7 @@ BUILTIN_TOOLS = {"code_execution", "google_search", "url_context"}
 SECRET_VERSION_RE = re.compile(r"^projects/[^/]+/secrets/[^/]+/versions/[0-9]+$")
 NAME_RE = re.compile(r"^[a-z][a-z0-9-]{0,39}[a-z0-9]$")
 REVISION_RE = re.compile(r"^[a-z][a-z0-9_-]{0,63}$")
-MCP_NAME_RE = re.compile(r"^[a-z0-9_]+$")
+MCP_NAME_RE = re.compile(r"^[a-z0-9_-]+$")
 RESERVED_PREFIXES = (
     "antigravity-",
     "veo-",
@@ -302,7 +302,7 @@ def normalize_tools(
         reject_unknown(server, {"name", "url", "allowed_tools", "headers"}, item_context)
         name = require_string(server.get("name"), f"{item_context}.name")
         if not MCP_NAME_RE.fullmatch(name):
-            fail(f"{item_context}.name must contain lowercase letters, digits, and underscores")
+            fail(f"{item_context}.name must match ^[a-z0-9_-]+$")
         if name in names:
             fail(f"duplicate MCP server name: {name}")
         names.add(name)

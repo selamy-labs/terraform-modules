@@ -240,6 +240,53 @@ class RenderTests(unittest.TestCase):
             with self.assertRaisesRegex(agentctl.ReconcilerError, "without credentials"):
                 agentctl.render_manifest(manifest_path)
 
+    def test_mcp_name_accepts_documented_hyphens_and_rejects_other_characters(self) -> None:
+        for name in ("weather-api", "weather_api", "weather123"):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                copy_path = Path(directory) / "test-worker"
+                shutil.copytree(FIXTURE, copy_path)
+                manifest_path = copy_path / "agent.json"
+                document = json.loads(manifest_path.read_text(encoding="utf-8"))
+                revision = document["spec"]["revisions"]["v1"]
+                revision["network"] = {
+                    "mode": "allowlist",
+                    "allowlist": [{"domain": "api.example.com"}],
+                }
+                revision["mcp_servers"] = [
+                    {
+                        "name": name,
+                        "url": "https://api.example.com/mcp",
+                        "allowed_tools": ["search"],
+                    }
+                ]
+                manifest_path.write_text(json.dumps(document), encoding="utf-8")
+
+                rendered = agentctl.render_manifest(manifest_path)
+                self.assertEqual(rendered.revisions["v1"].payload["tools"][0]["name"], name)
+
+        for name in ("Weather-api", "weather.api", "weather api"):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                copy_path = Path(directory) / "test-worker"
+                shutil.copytree(FIXTURE, copy_path)
+                manifest_path = copy_path / "agent.json"
+                document = json.loads(manifest_path.read_text(encoding="utf-8"))
+                revision = document["spec"]["revisions"]["v1"]
+                revision["network"] = {
+                    "mode": "allowlist",
+                    "allowlist": [{"domain": "api.example.com"}],
+                }
+                revision["mcp_servers"] = [
+                    {
+                        "name": name,
+                        "url": "https://api.example.com/mcp",
+                        "allowed_tools": ["search"],
+                    }
+                ]
+                manifest_path.write_text(json.dumps(document), encoding="utf-8")
+
+                with self.assertRaisesRegex(agentctl.ReconcilerError, "\\^\\[a-z0-9_-"):
+                    agentctl.render_manifest(manifest_path)
+
     def test_json_booleans_are_not_accepted_as_integers(self) -> None:
         for field, value in (("max_total_tokens", True), ("reconcile_generation", False)):
             with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:

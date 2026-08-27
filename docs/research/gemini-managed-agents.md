@@ -107,16 +107,20 @@ constraints. Primary sources win when documentation conflicts.
    `AllowedTools` policy objects. REST is the reconciler boundary, so the module
    emits one `{ "mode": "auto", "tools": [...] }` policy and guards that wire
    shape in its strict contract fake.
-7. The API accepts an allowlist header transform as either a single object or a
+7. The MCP prose says server names are lowercase and alphanumeric, while the
+   exact field contract is `^[a-z0-9_-]+$`. The reconciler follows the exact
+   field contract, including underscores and hyphens, and rejects every other
+   character.
+8. The API accepts an allowlist header transform as either a single object or a
    list of objects. The module emits the simpler object form. Drift comparison
    accepts the service-normalized single-item list as equivalent, while a
    multi-item or malformed transform fails closed as redacted drift.
-8. The top-level `system_instruction` is additive with mounted
+9. The top-level `system_instruction` is additive with mounted
    `.agents/AGENTS.md`. The normalized manifest therefore requires a
    revision-relative system-instruction file and hashes both instruction
    surfaces into the immutable revision rather than relying on an unmanaged
    console field.
-9. Managed agents are available under both free-tier quota and paid
+10. Managed agents are available under both free-tier quota and paid
    pay-as-you-go terms. For a paid-tier deployment, Cloud Billing can report a
    project as billing-enabled while its Gemini API plan is not yet eligible to
    serve paid calls or a Prepay balance is empty. The module supports either
