@@ -107,6 +107,15 @@ so the schema output is a caller-side exact-parse contract, not a claim that the
 service accepted `response_format`. Invocation clients should extract the
 current REST `steps` response and fail closed against this exact schema.
 
+Each revision must declare a positive `max_total_tokens`. The module treats this
+best-effort per-interaction ceiling as behavior-bearing: it contributes to the
+immutable revision ID, is sent in `agent_config`, and is checked on remote read
+and drift reconciliation. Named-agent callers must not override it. Reaching
+the ceiling produces `status:"incomplete"`, but the provider's general status
+contract permits other incomplete results too. Callers must fail closed and use
+typed evidence before calling the cause budget exhaustion. The module never
+starts or continues interactions.
+
 See the [complete example](examples/complete/) for the normalized manifest,
 remote MCP tool subsets, immutable Secret Manager header references, typed
 output, and evaluation cases.

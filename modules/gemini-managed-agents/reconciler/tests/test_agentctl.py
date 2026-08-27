@@ -190,6 +190,36 @@ class RenderTests(unittest.TestCase):
         self.assertNotEqual(before.agent_id, after.agent_id)
         self.assertEqual(after.payload["system_instruction"], "You are a changed typed worker.\n")
 
+    def test_token_budget_is_immutable_and_remote_drift_is_reconciled(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            copy_path = Path(directory) / "test-worker"
+            shutil.copytree(FIXTURE, copy_path)
+            manifest = copy_path / "agent.json"
+            before = agentctl.render_manifest(manifest).revisions["v1"]
+            document = json.loads(manifest.read_text(encoding="utf-8"))
+            document["spec"]["revisions"]["v1"]["max_total_tokens"] = 2000
+            manifest.write_text(json.dumps(document), encoding="utf-8")
+            after = agentctl.render_manifest(manifest).revisions["v1"]
+
+            self.assertNotEqual(before.revision_digest, after.revision_digest)
+            self.assertNotEqual(before.agent_id, after.agent_id)
+            self.assertEqual(after.payload["agent_config"]["max_total_tokens"], "2000")
+
+            with fake_api() as api:
+                args = reconcile_args(manifest)
+                agentctl.reconcile(args)
+                client = agentctl.ApiClient("example-project-12345", "oauth", "")
+                remote_key = ("example-project-12345", after.agent_id)
+                remote = api.agents[remote_key]
+                remote["agent_config"]["max_total_tokens"] = "3000"
+                self.assertEqual(agentctl.status_for(client, after)["status"], "drifted")
+                agentctl.reconcile(args)
+                self.assertEqual(agentctl.status_for(client, after)["status"], "current")
+                self.assertEqual(
+                    api.agents[remote_key]["agent_config"]["max_total_tokens"],
+                    "2000",
+                )
+
     def test_mcp_subset_uses_current_agents_api_wire_shape(self) -> None:
         revision = agentctl.render_manifest(COMPLETE / "agent.json").revisions["v1"]
         mcp_tool = revision.payload["tools"][0]

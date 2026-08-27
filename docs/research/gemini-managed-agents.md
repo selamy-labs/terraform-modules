@@ -11,8 +11,8 @@ constraints. Primary sources win when documentation conflicts.
 - [Agents overview](https://ai.google.dev/gemini-api/docs/agents): managed
   agents provision Google-hosted Linux sandboxes. The service is Public Preview,
   allows unrestricted outbound traffic by default, permits up to 1,000 agents,
-  expires inactive environments after seven days, and commonly consumes 100k to
-  3M tokens per interaction.
+  expires inactive environments after seven days, and complex workflows may
+  consume 3–5M tokens and cost about USD 5 in one interaction.
 - [Building managed agents](https://ai.google.dev/gemini-api/docs/custom-agents):
   named agents are created from instructions, tools, file sources, and a base
   environment. Omitted tools grant Code Execution, Google Search, and URL
@@ -141,6 +141,16 @@ constraints. Primary sources win when documentation conflicts.
     `store:true`, checkpoint the interaction ID, and own subsequent read,
     cancel, retention, and delete behavior. Those are invocation concerns and
     remain outside this definition-only module.
+13. `agent_config.max_total_tokens` is exposed by create/get and cannot be
+    overridden at interaction time for a named agent. Every module revision
+    therefore requires a positive immutable budget, hashes it into the revision,
+    sends it at agent creation, and includes it in read/drift comparison. The
+    limit is best-effort and may be exceeded slightly between steps. Reaching
+    this ceiling returns `status:"incomplete"`, but the general status contract
+    does not make budget exhaustion the only cause of incomplete results.
+    Invocation clients must fail closed on every incomplete result, classify
+    budget exhaustion only from typed provider evidence, and never continue
+    implicitly; a continuation is a new interaction with a new budget.
 
 ## Provider and module coverage
 
