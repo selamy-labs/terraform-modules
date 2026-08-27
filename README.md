@@ -7,6 +7,7 @@ Reusable OpenTofu modules for cloud/provider resources. Layer split: TF = cloud,
 | Module | Description |
 |--------|-------------|
 | [agent](modules/agent/) | Canonical Selamy agent/employee contract + GSM credential shells |
+| [gemini-managed-agents](modules/gemini-managed-agents/) | Immutable Gemini Developer API managed agents from portable manifests |
 | [gsm-secret](modules/gsm-secret/) | Google Secret Manager secret + optional version + IAM |
 | [gcp-sa-wif](modules/gcp-sa-wif/) | GCP service account + Workload Identity Federation |
 | [github-repo](modules/github-repo/) | GitHub repository + branch protection + defaults |

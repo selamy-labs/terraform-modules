@@ -14,6 +14,36 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  public-boundary:
+    name: public boundary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan current tree
+        run: python3 scripts/check_public_boundary.py --tree
+      - name: Scan pull-request metadata and new history
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_BRANCH: ${{ github.head_ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: >-
+          python3 scripts/check_public_boundary.py
+          --git-range "${BASE_SHA}..${HEAD_SHA}"
+          --metadata "${HEAD_BRANCH}"
+          --metadata "${PR_TITLE}"
+          --metadata "${PR_BODY}"
+      - name: Scan pushed history
+        if: ${{ github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000' }}
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: python3 scripts/check_public_boundary.py --git-range "${BEFORE_SHA}..${HEAD_SHA}"
+
   workflow-policy:
     name: workflow policy
     runs-on: ubuntu-latest
@@ -40,7 +70,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: terraform-linters/setup-tflint@v4
         with:
-          tflint_version: latest
+          tflint_version: v0.64.0
       - name: Init tflint plugins
         run: tflint --init
       - name: Lint modules
@@ -59,6 +89,7 @@ jobs:
       - name: Run Trivy misconfig scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
+          version: v0.70.0
           scan-type: config
           scan-ref: .
           severity: HIGH,CRITICAL
@@ -84,6 +115,20 @@ jobs:
             echo "::endgroup::"
           done
           exit $overall
+
+  reconciler-contract:
+    name: managed-agent reconciler contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.12.3
+          tofu_wrapper: false
+      - name: Run unit and OpenTofu lifecycle tests
+        run: >-
+          python3 -m unittest discover
+          -s modules/gemini-managed-agents/reconciler/tests -v
 
   terraform-docs:
     name: terraform-docs drift check
@@ -115,3 +160,18 @@ jobs:
             cd "$GITHUB_WORKSPACE"
             echo "::endgroup::"
           done
+
+  example-contract:
+    name: managed-agent examples and release ref
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.8.0
+      - name: Validate examples against this checkout
+        run: python3 scripts/validate_module_examples.py
+      - name: Verify documented release references
+        run: python3 scripts/check_module_release_refs.py

@@ -1,0 +1,32 @@
+{
+  "api_version": "agents.selamy.dev/v1alpha1",
+  "kind": "ManagedAgent",
+  "metadata": {
+    "name": "test-worker",
+    "labels": {"environment": "test"},
+    "annotations": {"owner": "module-tests"}
+  },
+  "spec": {
+    "backend": "gemini_developer_api",
+    "active_revision": "v1",
+    "revisions": {
+      "v1": {
+        "directory": "revisions/v1",
+        "description": "Returns a typed test result.",
+        "system_instruction": "instructions/system.md",
+        "base_agent": "antigravity-preview-05-2026",
+        "model": "gemini-3.7-flash",
+        "max_total_tokens": 1000,
+        "builtin_tools": [],
+        "mcp_servers": [],
+        "network": {"mode": "disabled"},
+        "output_schema": "schemas/output.schema.json",
+        "evaluation_cases": [],
+        "lifecycle": {
+          "deletion_policy": "delete",
+          "reconcile_generation": 0
+        }
+      }
+    }
+  }
+}

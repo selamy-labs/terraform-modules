@@ -1,0 +1,56 @@
+{
+  "api_version": "agents.selamy.dev/v1alpha1",
+  "kind": "ManagedAgent",
+  "metadata": {
+    "name": "research-assistant",
+    "labels": {
+      "environment": "example",
+      "data_class": "public"
+    },
+    "annotations": {
+      "owner": "research"
+    }
+  },
+  "spec": {
+    "backend": "gemini_developer_api",
+    "active_revision": "v1",
+    "revisions": {
+      "v1": {
+        "directory": "revisions/v1",
+        "description": "Produces source-grounded research briefs.",
+        "system_instruction": "instructions/system.md",
+        "base_agent": "antigravity-preview-05-2026",
+        "model": "gemini-3.7-flash",
+        "max_total_tokens": 250000,
+        "builtin_tools": [],
+        "mcp_servers": [
+          {
+            "name": "research_catalog",
+            "url": "https://research.example.com/mcp",
+            "allowed_tools": ["search_publications", "read_publication"],
+            "headers": {
+              "Authorization": {
+                "secret_manager_version": "projects/example-project-12345/secrets/research-catalog-token/versions/3",
+                "prefix": "Bearer "
+              }
+            }
+          }
+        ],
+        "network": {
+          "mode": "allowlist",
+          "allowlist": [
+            {
+              "domain": "research.example.com"
+            }
+          ]
+        },
+        "output_schema": "schemas/output.schema.json",
+        "evaluation_cases": ["evaluations/cases.jsonl"],
+        "lifecycle": {
+          "deletion_policy": "delete",
+          "reconcile_generation": 0
+        }
+      }
+    }
+  }
+}

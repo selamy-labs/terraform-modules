@@ -2,8 +2,8 @@
 
 Every new Selamy repo that provisions cloud/k8s resources MUST consume the
 canonical shared IaC instead of home-rolling its own modules or charts. This is
-the default, not an option — forks are how `matchpoint-github-runners-helm` and
-`spot-argocd-cloudspace` happened (laneq #628).
+the default, not an option — duplicated private runner and delivery modules are
+the failure mode this policy prevents (laneq #628).
 
 ## Canonical homes
 
