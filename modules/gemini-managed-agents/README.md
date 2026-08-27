@@ -258,7 +258,7 @@ unit/contract tests, idempotent apply, drift repair, and destroy tests green.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_external"></a> [external](#provider\_external) | 2.4.1 |
+| <a name="provider_external"></a> [external](#provider\_external) | = 2.4.1 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules

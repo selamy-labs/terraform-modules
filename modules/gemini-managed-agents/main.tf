@@ -9,6 +9,7 @@ resource "terraform_data" "revision" {
     manifest_path                  = each.value.manifest_path
     python_executable              = var.python_executable
     project_id                     = var.project_id
+    reconcile_generation           = each.value.reconcile_generation
     reconciler_source              = file(local.reconciler_path)
     revision_digest                = each.value.revision_digest
     revision_key                   = each.value.revision_key

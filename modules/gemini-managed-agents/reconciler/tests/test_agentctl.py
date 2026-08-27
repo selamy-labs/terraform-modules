@@ -619,7 +619,10 @@ output "drift_report" {{
                 document = json.loads(manifest_path.read_text(encoding="utf-8"))
                 document["spec"]["revisions"]["stable"]["lifecycle"]["reconcile_generation"] = 1
                 manifest_path.write_text(json.dumps(document), encoding="utf-8")
+                api.events.clear()
                 tofu("apply", "-auto-approve", "-input=false", f"-var=project_id={new_project}")
+                self.assertIn(("DELETE", agent_id, new_project), api.events)
+                self.assertIn(("POST", agent_id, new_project), api.events)
                 tofu("plan", "-detailed-exitcode", "-input=false", f"-var=project_id={new_project}")
 
                 old_key_reference = "projects/example-project-67890/secrets/agent-api-key-old/versions/1"

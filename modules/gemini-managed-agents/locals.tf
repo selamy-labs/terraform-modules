@@ -31,6 +31,12 @@ locals {
     for agent_id, owners in local.revision_groups : agent_id => merge(owners[0], {
       owner_count = length(owners)
       owner_paths = [for owner in owners : "${owner.manifest_key}/${owner.revision_key}"]
+      # Read this lifecycle-only control directly from source so a rapid
+      # declared repair cannot be hidden by an external data-source refresh.
+      reconcile_generation = try(
+        jsondecode(file(owners[0].manifest_path)).spec.revisions[owners[0].revision_key].lifecycle.reconcile_generation,
+        0,
+      )
     })
   }
 
