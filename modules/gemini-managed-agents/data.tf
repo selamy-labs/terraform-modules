@@ -5,6 +5,12 @@ data "external" "manifest" {
 
   query = {
     manifest_path = each.value
+    source_tree_digest = sha256(jsonencode([
+      for relative_path in sort(tolist(fileset(dirname(each.value), "**"))) : {
+        path   = relative_path
+        sha256 = filesha256("${dirname(each.value)}/${relative_path}")
+      }
+    ]))
   }
 }
 
