@@ -31,7 +31,7 @@ resource "terraform_data" "revision" {
 
     precondition {
       condition     = each.value.reconcile_generation_valid
-      error_message = "Every declared lifecycle.reconcile_generation must be a non-negative integer before reconciliation."
+      error_message = "Every declared lifecycle.reconcile_generation must be an integer between 0 and ${local.max_reconcile_generation} before reconciliation."
     }
   }
 

@@ -57,6 +57,7 @@ RESERVED_PREFIXES = (
 )
 MAX_INLINE_FILE_BYTES = 1_000_000
 MAX_INLINE_TOTAL_BYTES = 2_000_000
+MAX_RECONCILE_GENERATION = 2_147_483_647
 OAUTH_SCOPES = (
     "https://www.googleapis.com/auth/cloud-platform,"
     "https://www.googleapis.com/auth/generative-language.retriever"
@@ -128,14 +129,15 @@ def string_map(value: Any, context: str) -> dict[str, str]:
     return dict(sorted(result.items()))
 
 
-def non_negative_integer(value: Any, context: str) -> int:
+def reconcile_generation_value(value: Any, context: str) -> int:
     if (
         isinstance(value, bool)
         or not isinstance(value, (int, float))
         or value < 0
+        or value > MAX_RECONCILE_GENERATION
         or (isinstance(value, float) and (not math.isfinite(value) or not value.is_integer()))
     ):
-        fail(f"{context} must be a non-negative integer")
+        fail(f"{context} must be an integer between 0 and {MAX_RECONCILE_GENERATION}")
     return int(value)
 
 
@@ -472,7 +474,7 @@ def render_manifest(manifest_path: Path) -> RenderedManifest:
         deletion_policy = lifecycle.get("deletion_policy", "delete")
         if deletion_policy not in {"delete", "retain"}:
             fail(f"{context}.lifecycle.deletion_policy must be delete or retain")
-        reconcile_generation = non_negative_integer(
+        reconcile_generation = reconcile_generation_value(
             lifecycle.get("reconcile_generation", 0),
             f"{context}.lifecycle.reconcile_generation",
         )

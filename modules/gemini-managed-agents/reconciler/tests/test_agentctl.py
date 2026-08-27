@@ -642,12 +642,34 @@ output "drift_report" {{
                         expected=(1,),
                     )
                     diagnostic = invalid_plan.stdout + invalid_plan.stderr
-                    self.assertIn("lifecycle.reconcile_generation must be a", diagnostic)
-                    self.assertIn("non-negative integer", diagnostic)
+                    self.assertIn("lifecycle.reconcile_generation must be an", diagnostic)
+                    self.assertIn("integer between 0 and 2147483647", diagnostic)
                     self.assertEqual(
                         sum(event[0] in {"DELETE", "POST"} for event in api.events),
                         0,
                     )
+
+                document["spec"]["revisions"]["stable"]["lifecycle"]["reconcile_generation"] = 0
+                exponent_manifest = json.dumps(document).replace(
+                    '"reconcile_generation": 0',
+                    '"reconcile_generation": 1e999',
+                )
+                self.assertIn('"reconcile_generation": 1e999', exponent_manifest)
+                manifest_path.write_text(exponent_manifest, encoding="utf-8")
+                api.events.clear()
+                exponent_plan = tofu(
+                    "plan",
+                    "-input=false",
+                    f"-var=project_id={new_project}",
+                    expected=(1,),
+                )
+                exponent_diagnostic = exponent_plan.stdout + exponent_plan.stderr
+                self.assertIn("lifecycle.reconcile_generation must be an", exponent_diagnostic)
+                self.assertIn("integer between 0 and 2147483647", exponent_diagnostic)
+                self.assertEqual(
+                    sum(event[0] in {"DELETE", "POST"} for event in api.events),
+                    0,
+                )
 
                 stable_revision = document["spec"]["revisions"].pop("stable")
                 manifest_path.write_text(json.dumps(document), encoding="utf-8")

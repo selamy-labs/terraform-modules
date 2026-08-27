@@ -6,6 +6,7 @@ locals {
   source_manifests = {
     for key, path in local.manifest_paths : key => jsondecode(file(path))
   }
+  max_reconcile_generation = 2147483647
 
   rendered_manifests = {
     for key, rendered in data.external.manifest : key => jsondecode(rendered.result.manifest_json)
@@ -49,6 +50,10 @@ locals {
             0,
           )),
         ))
+        && try(
+          local.source_manifests[owners[0].manifest_key].spec.revisions[owners[0].revision_key].lifecycle.reconcile_generation <= local.max_reconcile_generation,
+          true,
+        )
       )
     })
   }
