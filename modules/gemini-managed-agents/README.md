@@ -101,7 +101,11 @@ the manifest names its revision-relative path with `system_instruction`. Files
 below `runtime/` become inline environment sources. The reconciler rejects
 files over 1 MB or revisions over 2 MB, matching the service limits. Output
 schemas and evaluation cases contribute to the revision digest and are returned
-to consumers, but are not mounted into the runtime sandbox.
+to consumers, but are not mounted into the runtime sandbox. The current
+Antigravity managed agent does not support provider-enforced structured output,
+so the schema output is a caller-side exact-parse contract, not a claim that the
+service accepted `response_format`. Invocation clients should extract the
+current REST `steps` response and fail closed against this exact schema.
 
 See the [complete example](examples/complete/) for the normalized manifest,
 remote MCP tool subsets, immutable Secret Manager header references, typed

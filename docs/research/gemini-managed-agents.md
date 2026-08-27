@@ -33,11 +33,21 @@ constraints. Primary sources win when documentation conflicts.
   are limited to 1 MB each and 2 MB total; repositories are limited to 500 MB
   and Cloud Storage sources to 2 GB. Credentials can be injected by the egress
   proxy without entering the sandbox.
-- [Background execution](https://ai.google.dev/gemini-api/docs/background-execution)
-  and the [Interactions API](https://ai.google.dev/api/interactions-api): managed
-  interactions support background execution, status reads, streaming, and
-  cancellation. Typed response JSON Schema is an invocation concern, not an
-  Agent resource field.
+- [Antigravity agent](https://ai.google.dev/gemini-api/docs/antigravity-agent)
+  and the [Interactions API](https://ai.google.dev/api/interactions-api-v1): a
+  named managed agent is invoked with `agent`, `input`, and
+  `environment:"remote"`. Background execution supports status reads and
+  cancellation, but requires `store:true`; cancellation applies only while a
+  background interaction is running. The formal REST reference uses
+  `POST /interactions/{id}/cancel`, while the Antigravity guide currently shows
+  `POST /interactions/{id}:cancel`, so a live contract probe must settle the
+  wire path before an invocation client ships.
+- [Interactions API May 2026 migration](https://ai.google.dev/gemini-api/docs/interactions-breaking-changes-may-2026):
+  current REST responses use `steps`, not the retired `outputs` shape. The
+  `output_text` convenience field is SDK-added, so REST consumers must parse
+  the typed `steps` payload. The current structured-output request shape for
+  model interactions is `response_format` with `type:"text"`,
+  `mime_type:"application/json"`, and `schema`.
 - [OAuth quickstart](https://ai.google.dev/gemini-api/docs/oauth): OAuth and ADC
   are supported for stricter access control. The documented scopes are
   `cloud-platform` and `generative-language.retriever`.
@@ -66,7 +76,8 @@ constraints. Primary sources win when documentation conflicts.
   [zero data retention](https://ai.google.dev/gemini-api/docs/zdr): paid-service
   prompts and responses are not used to improve Google products, but limited
   abuse-monitoring retention remains. Interactions store state by default unless
-  callers set `store:false`. This module never invokes interactions.
+  callers set `store:false`; background agent execution cannot use that
+  stateless mode. This module never invokes interactions.
 
 ## Conflicts resolved
 
@@ -81,9 +92,11 @@ constraints. Primary sources win when documentation conflicts.
 3. Deleting an agent does not delete already-created environments or
    interactions. The module manages agent definitions only and makes no broader
    cleanup claim.
-4. Invocation requests may override instructions, tools, and network settings.
-   Consumers must keep their typed invocation boundary from sending those
-   overrides; the module cannot enforce caller behavior.
+4. The general Interactions request exposes instruction and tool fields, and the
+   managed-agent guide shows invocation-time environment overrides. Named-agent
+   model selection is locked. Consumers that need the declared revision to be
+   the complete behavior boundary must omit every invocation-time behavior or
+   environment override; the module cannot enforce caller behavior.
 5. The API accepts repository and Cloud Storage sources but does not expose an
    integrity field or a documented immutable revision selector. This module's
    initial schema therefore mounts only locally hashed, version-controlled
@@ -110,6 +123,20 @@ constraints. Primary sources win when documentation conflicts.
    tier and deliberately does not manage payments. Paid-tier operators must
    verify the AI Studio plan/status and an authenticated Agents API read before
    treating an environment as ready.
+10. The general Interactions schema documents JSON structured output, but the
+    newer, agent-specific Antigravity limitations explicitly state that managed
+    Antigravity execution does not support structured outputs. This module keeps
+    the output-schema path and digest as a versioned caller-side validation
+    contract. Invocation clients must not send `response_format` for these named
+    agents; they must parse the current REST `steps` shape and validate the
+    candidate locally. Exact schema conformance remains an empirical agent gate.
+11. `store:false` and recoverable background execution are mutually exclusive
+    today. A caller choosing ephemeral synchronous execution cannot claim
+    provider status recovery or provider-confirmed cancellation after losing
+    the response. A caller choosing background execution must explicitly accept
+    `store:true`, checkpoint the interaction ID, and own subsequent read,
+    cancel, retention, and delete behavior. Those are invocation concerns and
+    remain outside this definition-only module.
 
 ## Provider and module coverage
 
