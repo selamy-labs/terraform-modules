@@ -20,13 +20,18 @@ resource "terraform_data" "revision" {
     var.authentication.mode,
     var.authentication.api_key_secret_manager_version == null ? "" : var.authentication.api_key_secret_manager_version,
     each.value.revision_digest,
-    tostring(each.value.reconcile_generation),
+    each.value.reconcile_generation,
   ]
 
   lifecycle {
     precondition {
       condition     = each.value.owner_count == 1
       error_message = "Each content-addressed agent ID must have exactly one manifest/revision owner; ${each.value.agent_id} is declared by ${join(", ", each.value.owner_paths)}."
+    }
+
+    precondition {
+      condition     = each.value.reconcile_generation_valid
+      error_message = "Every declared lifecycle.reconcile_generation must be a non-negative integer before reconciliation."
     }
   }
 

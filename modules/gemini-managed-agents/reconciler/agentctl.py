@@ -8,6 +8,7 @@ import base64
 import hashlib
 import hmac
 import json
+import math
 import os
 import re
 import subprocess
@@ -125,6 +126,17 @@ def string_map(value: Any, context: str) -> dict[str, str]:
             fail(f"{context} must contain string keys and values")
         result[key] = item
     return dict(sorted(result.items()))
+
+
+def non_negative_integer(value: Any, context: str) -> int:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or value < 0
+        or (isinstance(value, float) and (not math.isfinite(value) or not value.is_integer()))
+    ):
+        fail(f"{context} must be a non-negative integer")
+    return int(value)
 
 
 def resolve_inside(base: Path, relative: str, context: str) -> Path:
@@ -460,9 +472,10 @@ def render_manifest(manifest_path: Path) -> RenderedManifest:
         deletion_policy = lifecycle.get("deletion_policy", "delete")
         if deletion_policy not in {"delete", "retain"}:
             fail(f"{context}.lifecycle.deletion_policy must be delete or retain")
-        reconcile_generation = lifecycle.get("reconcile_generation", 0)
-        if type(reconcile_generation) is not int or reconcile_generation < 0:
-            fail(f"{context}.lifecycle.reconcile_generation must be a non-negative integer")
+        reconcile_generation = non_negative_integer(
+            lifecycle.get("reconcile_generation", 0),
+            f"{context}.lifecycle.reconcile_generation",
+        )
 
         portable = {
             "api_version": API_VERSION,

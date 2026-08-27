@@ -3,6 +3,9 @@ locals {
   manifest_paths = {
     for key, value in var.manifest_paths : key => startswith(value, "/") ? value : abspath("${path.root}/${value}")
   }
+  source_manifests = {
+    for key, path in local.manifest_paths : key => jsondecode(file(path))
+  }
 
   rendered_manifests = {
     for key, rendered in data.external.manifest : key => jsondecode(rendered.result.manifest_json)
@@ -34,8 +37,18 @@ locals {
       # Read this lifecycle-only control directly from source so a rapid
       # declared repair cannot be hidden by an external data-source refresh.
       reconcile_generation = try(
-        jsondecode(file(owners[0].manifest_path)).spec.revisions[owners[0].revision_key].lifecycle.reconcile_generation,
+        local.source_manifests[owners[0].manifest_key].spec.revisions[owners[0].revision_key].lifecycle.reconcile_generation,
         0,
+      )
+      reconcile_generation_valid = (
+        can(local.source_manifests[owners[0].manifest_key].spec.revisions[owners[0].revision_key])
+        && can(regex(
+          "^(0|[1-9][0-9]*)$",
+          jsonencode(try(
+            local.source_manifests[owners[0].manifest_key].spec.revisions[owners[0].revision_key].lifecycle.reconcile_generation,
+            0,
+          )),
+        ))
       )
     })
   }

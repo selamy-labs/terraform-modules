@@ -334,6 +334,20 @@ class RenderTests(unittest.TestCase):
                 with self.assertRaises(agentctl.ReconcilerError):
                     agentctl.render_manifest(manifest_path)
 
+    def test_integral_json_numbers_normalize_for_hcl_consistency(self) -> None:
+        for value, expected in ((1.0, 1), (1e3, 1000)):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as directory:
+                copy_path = Path(directory) / "test-worker"
+                shutil.copytree(FIXTURE, copy_path)
+                manifest_path = copy_path / "agent.json"
+                document = json.loads(manifest_path.read_text(encoding="utf-8"))
+                revision = document["spec"]["revisions"]["v1"]
+                revision["lifecycle"]["reconcile_generation"] = value
+                manifest_path.write_text(json.dumps(document), encoding="utf-8")
+
+                rendered = agentctl.render_manifest(manifest_path).revisions["v1"]
+                self.assertEqual(rendered.summary["reconcile_generation"], expected)
+
 
 class LifecycleTests(unittest.TestCase):
     PROJECT = "example-project-12345"
@@ -617,6 +631,60 @@ output "drift_report" {{
                 )
 
                 document = json.loads(manifest_path.read_text(encoding="utf-8"))
+                for invalid_generation in (True, "1", 1.5, -1):
+                    document["spec"]["revisions"]["stable"]["lifecycle"]["reconcile_generation"] = invalid_generation
+                    manifest_path.write_text(json.dumps(document), encoding="utf-8")
+                    api.events.clear()
+                    invalid_plan = tofu(
+                        "plan",
+                        "-input=false",
+                        f"-var=project_id={new_project}",
+                        expected=(1,),
+                    )
+                    diagnostic = invalid_plan.stdout + invalid_plan.stderr
+                    self.assertIn("lifecycle.reconcile_generation must be a", diagnostic)
+                    self.assertIn("non-negative integer", diagnostic)
+                    self.assertEqual(
+                        sum(event[0] in {"DELETE", "POST"} for event in api.events),
+                        0,
+                    )
+
+                stable_revision = document["spec"]["revisions"].pop("stable")
+                manifest_path.write_text(json.dumps(document), encoding="utf-8")
+                api.events.clear()
+                missing_revision_plan = tofu(
+                    "plan",
+                    "-input=false",
+                    f"-var=project_id={new_project}",
+                    expected=(1,),
+                )
+                self.assertIn(
+                    "revisions must not be empty",
+                    missing_revision_plan.stdout + missing_revision_plan.stderr,
+                )
+                self.assertEqual(
+                    sum(event[0] in {"DELETE", "POST"} for event in api.events),
+                    0,
+                )
+                document["spec"]["revisions"]["stable"] = stable_revision
+
+                manifest_path.write_text("{", encoding="utf-8")
+                api.events.clear()
+                malformed_plan = tofu(
+                    "plan",
+                    "-input=false",
+                    f"-var=project_id={new_project}",
+                    expected=(1,),
+                )
+                self.assertIn(
+                    'Call to function "jsondecode" failed',
+                    malformed_plan.stdout + malformed_plan.stderr,
+                )
+                self.assertEqual(
+                    sum(event[0] in {"DELETE", "POST"} for event in api.events),
+                    0,
+                )
+
                 document["spec"]["revisions"]["stable"]["lifecycle"]["reconcile_generation"] = 1
                 manifest_path.write_text(json.dumps(document), encoding="utf-8")
                 api.events.clear()
