@@ -127,14 +127,14 @@ constraints. Primary sources win when documentation conflicts.
    tier and deliberately does not manage payments. Paid-tier operators must
    verify the AI Studio plan/status and an authenticated Agents API read before
    treating an environment as ready.
-10. The general Interactions schema documents JSON structured output, but the
+11. The general Interactions schema documents JSON structured output, but the
     newer, agent-specific Antigravity limitations explicitly state that managed
     Antigravity execution does not support structured outputs. This module keeps
     the output-schema path and digest as a versioned caller-side validation
     contract. Invocation clients must not send `response_format` for these named
     agents; they must parse the current REST `steps` shape and validate the
     candidate locally. Exact schema conformance remains an empirical agent gate.
-11. `store:false` and recoverable background execution are mutually exclusive
+12. `store:false` and recoverable background execution are mutually exclusive
     today. A caller choosing ephemeral synchronous execution cannot claim
     provider status recovery or provider-confirmed cancellation after losing
     the response. A caller choosing background execution must explicitly accept
